@@ -1,12 +1,12 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 import fragment from "./shader/fragment.glsl";
 import vertex from "./shader/vertex.glsl";
 import * as dat from "dat.gui";
 import gsap from "gsap";
-
-
 
 export default class Sketch {
   constructor(options) {
@@ -21,6 +21,13 @@ export default class Sketch {
     this.renderer.setClearColor(0x000000, 1); 
     this.renderer.physicallyCorrectLights = true;
     // this.renderer.outputEncoding = THREE.sRGBEncoding;
+
+    this.gltf_loader = new GLTFLoader();
+    this.draco_loader = new DRACOLoader();
+    this.draco_loader.setDecoderConfig({ type: 'js' });
+    this.draco_loader.setDecoderPath('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/'); // use a full url path
+    this.gltf_loader.setDRACOLoader(this.draco_loader);
+
     this.count = 0;
     this.container.appendChild(this.renderer.domElement);
 
@@ -35,7 +42,7 @@ export default class Sketch {
     // var frustumSize = 10;
     // var aspect = window.innerWidth / window.innerHeight;
     // this.camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000, 1000 );
-    this.camera.position.set(0, -0.5, 1);
+    this.camera.position.set(0, 0, 3);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.time = 0;
@@ -55,7 +62,7 @@ export default class Sketch {
       progress: 0.6,
     };
     this.gui = new dat.GUI();
-    this.gui.add(this.settings, "progress", 0, 6, 0.01);
+    this.gui.add(this.settings, "progress", 0, 5, 0.01);
   }
 
   setupResize() {
@@ -87,8 +94,6 @@ export default class Sketch {
 
 
     this.camera.updateProjectionMatrix();
-
-
   }
 
   addObjects() {
@@ -110,9 +115,7 @@ export default class Sketch {
     });
 
     
-
-    
-    this.geometry = new THREE.PlaneGeometry(2, 2, 100, 100);
+    this.geometry = new THREE.PlaneGeometry(1, 1, 10, 10);
 
     this.mesh = new THREE.Mesh(this.geometry,this.material)
     this.scene.add(this.mesh)
